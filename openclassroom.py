@@ -76,29 +76,27 @@ def download_course(course):
     if not os.path.exists(path):
         os.makedirs(path)
 
-    uploads = []
-    
     soup = BeautifulSoup(req.get(urls[0]).content)
     h2titles = {}
     for title in soup.findAll('li', {'class': "course-part-summary "}):
         h2titles.update(dict((u.text.encode('utf-8'), u.get('href')) for u in title.findAll('a')))
 
     final = ""
+
     for url in urls:
         content = req.get(url)
 
         soup = BeautifulSoup(content.text)
         content = clean_html(url, name, soup)
-
-        uploads += [url.get('href') for url in soup.findAll('a') if 'uploads.siteduzero.com' in url.get('href', '')]
-        uploads += [url.get('src') for url in soup.findAll('img') if 'uploads.siteduzero.com' in url.get('src', '')]
-
         content = link2anchor(content, h2titles)
         final += convert_urls(str(content))
 
     with open('%s/%s.html' % (path, name), 'w') as f:      
         f.write(final)
 
+    uploads = [url.get('href') for url in soup.findAll('a') if 'uploads.siteduzero.com' in url.get('href', '')]
+    uploads += [url.get('src') for url in soup.findAll('img') if 'uploads.siteduzero.com' in url.get('src', '')]
+    
     download_files(uploads)
 
 
@@ -176,11 +174,12 @@ if __name__ == '__main__':
 
     sections = get_sections()
     courses = []
-    print('Checking sections')
+
     for section in sections:
         courses += get_list_courses(section)
 
     download_css()
+
     if sections:
         paths = [glob('%s/*' % (section.find('a').text.lower())) for section in sections]
         files = [path.split('/')[-1] for path in paths[0]]
