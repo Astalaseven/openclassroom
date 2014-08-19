@@ -59,9 +59,12 @@ def clean_html(url, name, soup):
 
     if not url.split('/')[-1] == name:
         header = soup.find('section', {'class': "alt-section course-header "})
+        headernoicon = soup.find('section', {'class': "alt-section course-header course-header--no-icon"})
         author = soup.find('section', {'class': "alt-section"})
         if header:
             header.extract()
+        if headernoicon:
+            headernoicon.extract()
         if author:
             author.extract()
 
@@ -178,7 +181,7 @@ if __name__ == '__main__':
     for section in sections:
         print('Getting list of courses for %s' % (section.text))
         courses += get_list_courses(section)
-
+    print('%s tutorials found' % (len(courses)))
     download_css()
 
     if sections:
