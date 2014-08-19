@@ -176,6 +176,7 @@ if __name__ == '__main__':
     courses = []
 
     for section in sections:
+        print('Getting list of courses for %s' % (section.text))
         courses += get_list_courses(section)
 
     download_css()
